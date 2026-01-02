@@ -9,8 +9,7 @@ window.TrelloPowerUp.initialize({
                     return t.modal({
                         title: "Listas del Tablero",
                         url: "./views/lists_view.html",
-                        height: 300,
-                        width: 400,
+                        height: 500,
                     });
                 },
             },
