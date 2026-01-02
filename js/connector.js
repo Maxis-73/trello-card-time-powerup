@@ -2,18 +2,9 @@ import { utils } from './utils.js';
 
 window.TrelloPowerUp.initialize({
     "board-buttons": function (t, opts) {
-        return [{
-            icon: "./icons/settings.svg",
-            text: "Tiempo de Tarjeta",
-            callback: function (t) {
-                return t.modal({
-                    title: "Tiempo de Tarjeta: Configuración",
-                    url: "./views/settings_panel.html",
-                    height: 600,
-                    width: 800,
-                })
-            }
-        }]
+        return t.lists("all").then(function (lists) {
+            console.log(JSON.stringify(lists, null, 2));
+        })
     },
     "card-badges": function (t, opts) {
         return t
