@@ -16,14 +16,23 @@ window.TrelloPowerUp.initialize({
         ];
     },
     "card-badges": function (t, opts) {
-        return t
-            .card("id")
-            .get("id")
-            .then(function (cardId) {
+        return Promise.all([
+            t.card("id", "idList"),
+            t.get('board', 'private', 'listStates', {})
+        ])
+            .then(function (results) {
+                var card = results[0];
+                var listStates = results[1];
+
+                // Si la lista está desmarcada (false), no mostramos nada
+                if (listStates[card.idList] === false) {
+                    return [];
+                }
+
                 return [
                     {
                         dynamic: function () {
-                            const creationDate = utils.getDateFromCardId(cardId);
+                            const creationDate = utils.getDateFromCardId(card.id);
                             const relativeTime = utils.getRelativeTime(creationDate);
                             return {
                                 text: relativeTime,
@@ -36,14 +45,22 @@ window.TrelloPowerUp.initialize({
             });
     },
     "card-detail-badges": function (t, opts) {
-        return t
-            .card("id")
-            .get("id")
-            .then(function (cardId) {
+        return Promise.all([
+            t.card("id", "idList"),
+            t.get('board', 'private', 'listStates', {})
+        ])
+            .then(function (results) {
+                var card = results[0];
+                var listStates = results[1];
+
+                if (listStates[card.idList] === false) {
+                    return [];
+                }
+
                 return [
                     {
                         dynamic: function () {
-                            const creationDate = utils.getDateFromCardId(cardId);
+                            const creationDate = utils.getDateFromCardId(card.id);
                             const relativeTime = utils.getRelativeTime(creationDate);
                             return {
                                 title: "Tiempo en tablero",
