@@ -1,9 +1,15 @@
 var t = window.TrelloPowerUp.iframe();
 
 t.render(function () {
-    return t.lists("all")
-        .then(function (lists) {
+    return Promise.all([
+        t.lists("all"),
+        t.get('board', 'private', 'listStates', {})
+    ])
+        .then(function (results) {
+            var lists = results[0];
+            var savedStates = results[1];
             var container = document.getElementById('lists-container');
+
             if (lists.length === 0) {
                 container.innerHTML = '<p>No hay listas en este tablero.</p>';
                 return;
@@ -20,7 +26,13 @@ t.render(function () {
 
                 var checkbox = document.createElement('input');
                 checkbox.type = 'checkbox';
-                checkbox.checked = true;
+                // Si no hay estado guardado, por defecto es true
+                checkbox.checked = savedStates[list.id] !== false;
+
+                checkbox.addEventListener('change', function () {
+                    savedStates[list.id] = checkbox.checked;
+                    t.set('board', 'private', 'listStates', savedStates);
+                });
 
                 listElement.appendChild(nameSpan);
                 listElement.appendChild(checkbox);
@@ -28,7 +40,7 @@ t.render(function () {
             });
         })
         .catch(function (error) {
-            console.error('Error al obtener listas:', error);
+            console.error('Error al obtener listas o estados:', error);
             document.getElementById('lists-container').innerHTML = '<p>Error al cargar las listas.</p>';
         });
 });
