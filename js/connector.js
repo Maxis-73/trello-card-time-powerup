@@ -2,9 +2,18 @@ import { utils } from './utils.js';
 
 window.TrelloPowerUp.initialize({
     "board-buttons": function (t, opts) {
-        return t.lists("all").then(function (lists) {
-            console.log(JSON.stringify(lists, null, 2));
-        })
+        return [
+            {
+                text: "Ver Listas",
+                callback: function (t) {
+                    return t.popup({
+                        title: "Listas del Tablero",
+                        url: "./views/lists_view.html",
+                        height: 300,
+                    });
+                },
+            },
+        ];
     },
     "card-badges": function (t, opts) {
         return t
