@@ -1,6 +1,16 @@
 import { utils } from './utils.js';
 
+var onBtnClick = function (t, opts) {
+    console.log("onBtnClick");
+}
+
 window.TrelloPowerUp.initialize({
+    "board-buttons": function (t, opts) {
+        return [{
+            text: "Click me",
+            callback: onBtnClick,
+        }]
+    },
     "card-badges": function (t, opts) {
         return t
             .card("id")
