@@ -6,9 +6,11 @@ window.TrelloPowerUp.initialize({
             icon: "./icons/settings.svg",
             text: "Tiempo de Tarjeta",
             callback: function (t) {
-                return t.popup({
+                return t.modal({
                     title: "Tiempo de Tarjeta: Configuración",
                     url: "./views/settings_panel.html",
+                    height: 600,
+                    width: 800,
                 })
             }
         }]
