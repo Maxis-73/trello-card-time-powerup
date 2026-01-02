@@ -18,13 +18,12 @@ t.render(function () {
                 nameSpan.className = 'list-name';
                 nameSpan.textContent = list.name;
 
-                var countSpan = document.createElement('span');
-                countSpan.className = 'card-count';
-                var cardCount = list.cards ? list.cards.length : 0;
-                countSpan.textContent = cardCount + (cardCount === 1 ? ' tarjeta' : ' tarjetas');
+                var checkbox = document.createElement('input');
+                checkbox.type = 'checkbox';
+                checkbox.checked = true;
 
                 listElement.appendChild(nameSpan);
-                listElement.appendChild(countSpan);
+                listElement.appendChild(checkbox);
                 container.appendChild(listElement);
             });
         })
