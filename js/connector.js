@@ -1,14 +1,16 @@
 import { utils } from './utils.js';
 
-var onBtnClick = function (t, opts) {
-    console.log("onBtnClick");
-}
-
 window.TrelloPowerUp.initialize({
     "board-buttons": function (t, opts) {
         return [{
-            text: "Click me",
-            callback: onBtnClick,
+            icon: "./icons/settings.svg",
+            text: "Tiempo de Tarjeta",
+            callback: function (t) {
+                return t.popup({
+                    title: "Tiempo de Tarjeta: Configuración",
+                    url: "./views/settings_panel.html",
+                })
+            }
         }]
     },
     "card-badges": function (t, opts) {
