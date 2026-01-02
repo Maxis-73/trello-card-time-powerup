@@ -1,32 +1,23 @@
+import { utils } from './utils.js';
+
 window.TrelloPowerUp.initialize({
     "card-badges": function (t, opts) {
         return t
-            .card("name")
-            .get("name")
-            .then(function (cardName) {
-                console.log("We just loaded the card name for fun: " + cardName);
+            .card("id")
+            .get("id")
+            .then(function (cardId) {
                 return [
                     {
-                        // Dynamic badges can have their function rerun
-                        // after a set number of seconds defined by refresh.
-                        // Minimum of 10 seconds.
                         dynamic: function () {
-                            // we could also return a Promise that resolves to
-                            // this as well if we needed to do something async first
+                            const creationDate = utils.getDateFromCardId(cardId);
+                            const relativeTime = utils.getRelativeTime(creationDate);
                             return {
-                                text: "Dynamic " + (Math.random() * 100).toFixed(0).toString(),
-                                color: "green",
-                                refresh: 10, // in seconds
+                                text: relativeTime,
+                                color: "blue",
+                                refresh: 120,
                             };
                         },
-                    },
-                    {
-                        // It's best to use static badges unless you need your
-                        // badges to refresh.
-                        // You can mix and match between static and dynamic
-                        text: "Static",
-                        color: null,
-                    },
+                    }
                 ];
             });
     },
