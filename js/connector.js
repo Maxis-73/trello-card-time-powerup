@@ -13,7 +13,7 @@ window.TrelloPowerUp.initialize({
                             const relativeTime = utils.getRelativeTime(creationDate);
                             return {
                                 text: relativeTime,
-                                icon: "../icons/time.svg",
+                                icon: "./icons/time.svg",
                                 refresh: 60,
                             };
                         },
