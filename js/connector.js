@@ -6,10 +6,11 @@ window.TrelloPowerUp.initialize({
             {
                 text: "Ver Listas",
                 callback: function (t) {
-                    return t.popup({
+                    return t.modal({
                         title: "Listas del Tablero",
                         url: "./views/lists_view.html",
                         height: 300,
+                        width: 400,
                     });
                 },
             },
