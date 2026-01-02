@@ -8,6 +8,7 @@ TrelloPowerUp.initialize({
                 console.log(boardTime);
                 return [{
                     text: boardTime,
+                    refresh: 300,
                 }]
             })
     }
