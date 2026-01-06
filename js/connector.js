@@ -85,5 +85,50 @@ window.TrelloPowerUp.initialize({
                     }
                 ];
             });
+    },
+
+    "card-detail-badges": function (t, opts) {
+        return Promise.all([
+            t.card("id", "idList"),
+            t.get('board', 'private', 'listStates', {})
+        ])
+            .then(async function (results) {
+                var card = results[0];
+                var listStates = results[1];
+
+                // Si la lista está desmarcada (false), no mostramos nada
+                if (listStates[card.idList] === false) {
+                    return [];
+                }
+
+                // Asegurar tracking de lista y obtener fecha de entrada
+                const listEntryDate = await ensureListTracking(t, card);
+                const creationDate = utils.getDateFromCardId(card.id);
+
+                return [
+                    {
+                        // Badge 1: Tiempo en lista actual
+                        dynamic: async function () {
+                            // Re-verificar tracking (puede haber cambiado de lista)
+                            const entryDate = await ensureListTracking(t, card);
+                            return {
+                                title: "Tiempo en lista",
+                                text: utils.getRelativeTime(entryDate),
+                                refresh: 60,
+                            };
+                        }
+                    },
+                    {
+                        // Badge 2: Tiempo total en tablero
+                        dynamic: function () {
+                            return {
+                                title: "Tiempo en tablero",
+                                text: utils.getRelativeTime(creationDate),
+                                refresh: 60,
+                            };
+                        }
+                    }
+                ];
+            });
     }
 })
