@@ -38,14 +38,26 @@ window.TrelloPowerUp.initialize({
                             return [];
                         }
 
+                        // Calcular tiempo total en el tablero desde la creación
+                        const creationDate = utils.getDateFromCardId(card.id);
+                        const relativeTimeInBoard = utils.getRelativeTime(creationDate);
+                        const relativeTimeInList = utils.getRelativeTime(new Date(updatedTracking.entryTime));
+
                         return [
                             {
                                 dynamic: function () {
-                                    const currentTime = utils.getCurrentListTime(updatedTracking);
-                                    const relativeTime = utils.getRelativeTime(new Date(updatedTracking.entryTime));
                                     return {
-                                        text: relativeTime,
+                                        text: relativeTimeInList,
                                         icon: "./icons/time.svg",
+                                        refresh: 60,
+                                    };
+                                },
+                            },
+                            {
+                                dynamic: function () {
+                                    return {
+                                        text: relativeTimeInBoard,
+                                        icon: "./icons/calendar.svg",
                                         refresh: 60,
                                     };
                                 },
@@ -80,14 +92,27 @@ window.TrelloPowerUp.initialize({
                         // Encontrar nombre de la lista actual
                         const currentList = lists.find(l => l.id === card.idList);
                         const listName = currentList ? currentList.name : 'esta lista';
-                        const relativeTime = utils.getRelativeTime(new Date(updatedTracking.entryTime));
+                        const relativeTimeInList = utils.getRelativeTime(new Date(updatedTracking.entryTime));
+
+                        // Calcular tiempo total en el tablero desde la creación
+                        const creationDate = utils.getDateFromCardId(card.id);
+                        const relativeTimeInBoard = utils.getRelativeTime(creationDate);
 
                         return [
                             {
                                 dynamic: function () {
                                     return {
                                         title: "Tiempo en " + listName,
-                                        text: relativeTime,
+                                        text: relativeTimeInList,
+                                        refresh: 60,
+                                    }
+                                }
+                            },
+                            {
+                                dynamic: function () {
+                                    return {
+                                        title: "Tiempo en tablero",
+                                        text: relativeTimeInBoard,
                                         refresh: 60,
                                     }
                                 }
