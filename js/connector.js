@@ -17,133 +17,83 @@ window.TrelloPowerUp.initialize({
     },
     "card-badges": function (t, opts) {
         return Promise.all([
-            t.card("id", "idList", "name"),
-            t.get('board', 'private', 'listStates', {}),
-            t.get('card', 'private', 'listTimeTracking')
+            t.card("id", "idList"),
+            t.card("board", "private", "listStates", {}),
+            t.get("card", "shared", "tracking", null)
         ])
             .then(function (results) {
-                var card = results[0];
-                var listStates = results[1];
-                var tracking = results[2];
+                const card = results[0];
+                const listStates = results[1];
+                let tracking = results[2];
 
-                // Si la lista está desmarcada (false), no mostramos nada
+                // Si la lista esta desactivada, no mostrar nada
                 if (listStates[card.idList] === false) {
                     return [];
                 }
 
-                // Actualizar tracking si cambió de lista
-                return utils.updateListTracking(t, card, tracking, listStates)
-                    .then(function (updatedTracking) {
-                        if (!updatedTracking) {
-                            return [];
+                const now = Date.now();
+
+                // Si la tarjeta se movió de lista o no tiene registro, se inicia el contador de tiempo
+                if (!tracking || tracking.lastListId !== card.idList) {
+                    tracking = {
+                        lastListId: card.idList,
+                        enteredAt: now
+                    }
+
+                    // Se guarda el nuevo estado
+                    t.set("card", "shared", "tracking", tracking);
+
+                    const timeInBoard = utils.getRelativeTime(utils.getDateFromCardId(card.id));
+                    const timeInList = utils.getRelativeTime(new Date(tracking.enteredAt));
+
+                    return [
+                        {
+                            text: `Tablero: ${timeInBoard}`,
+                            icon: "./icons/time.svg",
+                            refresh: 60
+                        },
+                        {
+                            text: `Lista: ${timeInList}`,
+                            icon: "./icons/calendar.svg",
+                            refresh: 60
                         }
+                    ]
+                }
 
-                        // Calcular tiempo total en el tablero desde la creación
-                        const creationDate = utils.getDateFromCardId(card.id);
-                        const relativeTimeInBoard = utils.getRelativeTime(creationDate);
-                        const relativeTimeInList = utils.getRelativeTime(new Date(updatedTracking.entryTime));
-
-                        return [
-                            {
-                                dynamic: function () {
-                                    return {
-                                        text: relativeTimeInList,
-                                        icon: "./icons/time.svg",
-                                        refresh: 60,
-                                    };
-                                },
-                            },
-                            {
-                                dynamic: function () {
-                                    return {
-                                        text: relativeTimeInBoard,
-                                        icon: "./icons/calendar.svg",
-                                        refresh: 60,
-                                    };
-                                },
-                            }
-                        ];
-                    });
-            });
+            })
     },
     "card-detail-badges": function (t, opts) {
         return Promise.all([
-            t.card("id", "idList", "name"),
+            t.card("id", "idList"),
             t.get('board', 'private', 'listStates', {}),
-            t.get('card', 'private', 'listTimeTracking'),
-            t.lists('all')
+            t.get('card', 'shared', 'tracking', null)
         ])
             .then(function (results) {
-                var card = results[0];
-                var listStates = results[1];
-                var tracking = results[2];
-                var lists = results[3];
+                const card = results[0];
+                const listStates = results[1];
+                const tracking = results[2];
 
                 if (listStates[card.idList] === false) {
                     return [];
                 }
 
-                return utils.updateListTracking(t, card, tracking, listStates)
-                    .then(function (updatedTracking) {
-                        if (!updatedTracking) {
-                            return [];
-                        }
+                const timeInBoard = utils.getRelativeTime(utils.getDateFromCardId(card.id));
 
-                        // Encontrar nombre de la lista actual
-                        const currentList = lists.find(l => l.id === card.idList);
-                        const listName = currentList ? currentList.name : 'esta lista';
-                        const relativeTimeInList = utils.getRelativeTime(new Date(updatedTracking.entryTime));
-
-                        // Calcular tiempo total en el tablero desde la creación
-                        const creationDate = utils.getDateFromCardId(card.id);
-                        const relativeTimeInBoard = utils.getRelativeTime(creationDate);
-
-                        return [
-                            {
-                                dynamic: function () {
-                                    return {
-                                        title: "Tiempo en " + listName,
-                                        text: relativeTimeInList,
-                                        refresh: 60,
-                                    }
-                                }
-                            },
-                            {
-                                dynamic: function () {
-                                    return {
-                                        title: "Tiempo en tablero",
-                                        text: relativeTimeInBoard,
-                                        refresh: 60,
-                                    }
-                                }
-                            }
-                        ];
-                    });
-            });
-    },
-    "card-back-section": function (t, opts) {
-        return Promise.all([
-            t.card("idList"),
-            t.get('board', 'private', 'listStates', {})
-        ])
-            .then(function (results) {
-                var card = results[0];
-                var listStates = results[1];
-
-                // Solo mostrar la sección si la tarjeta está en una lista seleccionada
-                if (listStates[card.idList] === false) {
-                    return [];
-                }
-
-                return [{
-                    title: "Tiempo por Lista",
-                    icon: "./icons/time.svg",
-                    content: {
-                        type: 'iframe',
-                        url: t.signUrl('./views/card_history.html'),
-                        height: 250
-                    }
+                let badges = [{
+                    title: "Tiempo en tablero",
+                    text: timeInBoard,
+                    refresh: 60
                 }];
+
+                if (tracking && tracking.enteredAt) {
+                    badges.push({
+                        title: "Tiempo en esta lista",
+                        text: utils.getRelativeTime(new Date(tracking.enteredAt)),
+                        refresh: 60
+                    });
+                }
+
+                return badges;
             });
     }
 });
