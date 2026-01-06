@@ -1,17 +1,11 @@
 export const utils = {
-    // Obtiene la fecha de creación original de la tarjeta desde su ID
     getDateFromCardId: (id) => {
         return new Date(parseInt(id.substring(0, 8), 16) * 1000);
     },
 
-    // Calcula el tiempo relativo entre una fecha pasada y "ahora"
     getRelativeTime: (date) => {
         const now = new Date();
         const diffInMs = now - date;
-        
-        // Manejo para tiempos negativos o "recién creados"
-        if (diffInMs < 0) return 'ahora';
-
         const diffInMins = Math.floor(diffInMs / (1000 * 60));
         const diffInHours = Math.floor(diffInMs / (1000 * 60 * 60));
         const diffInDays = Math.floor(diffInMs / (1000 * 60 * 60 * 24));
