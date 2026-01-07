@@ -121,18 +121,22 @@ async function ensureListTracking(t, card) {
 
 window.TrelloPowerUp.initialize({
     "board-buttons": function (t, opts) {
-        return [
-            {
-                text: t.localizeKey("board-button-title"),
-                callback: function (t) {
-                    return t.modal({
-                        title: t.localizeKey("modal-title"),
-                        url: "./views/lists_view.html",
-                        height: 500,
-                    })
+        return t.localize('board-button-title').then(function (buttonText) {
+            return [
+                {
+                    text: buttonText,
+                    callback: function (t) {
+                        return t.localize('modal-title').then(function (modalTitle) {
+                            return t.modal({
+                                title: modalTitle,
+                                url: "./views/lists_view.html",
+                                height: 500,
+                            });
+                        });
+                    }
                 }
-            }
-        ]
+            ];
+        });
     },
 
     "card-badges": function (t, opts) {
@@ -192,14 +196,21 @@ window.TrelloPowerUp.initialize({
                 await ensureListTracking(t, card);
                 const creationDate = utils.getDateFromCardId(card.id);
 
+                // Obtener traducciones
+                const [timeInListTitle, timeOnBoardTitle] = await Promise.all([
+                    t.localize('time-in-list'),
+                    t.localize('time-on-board')
+                ]);
+
                 return [
                     {
                         // Badge 1: Tiempo en lista actual
+                        title: timeInListTitle,
                         dynamic: async function () {
                             // Leer siempre la fecha actual del storage
                             const entryDate = await getListEntryDate(t);
                             return {
-                                title: t.localizeKey("time-in-list"),
+                                title: timeInListTitle,
                                 text: utils.getRelativeTime(entryDate),
                                 refresh: 60,
                             };
@@ -207,9 +218,10 @@ window.TrelloPowerUp.initialize({
                     },
                     {
                         // Badge 2: Tiempo total en tablero
+                        title: timeOnBoardTitle,
                         dynamic: function () {
                             return {
-                                title: t.localizeKey("time-on-board"),
+                                title: timeOnBoardTitle,
                                 text: utils.getRelativeTime(creationDate),
                                 refresh: 60,
                             };
@@ -219,15 +231,17 @@ window.TrelloPowerUp.initialize({
             });
     },
     "card-back-section": function (t, opts) {
-        return {
-            title: t.localizeKey("history-title"),
-            icon: "./icons/time.svg",
-            content: {
-                type: "iframe",
-                url: t.signUrl("./views/card_history.html"),
-                height: 300,
-            }
-        };
+        return t.localize('history-title').then(function (historyTitle) {
+            return {
+                title: historyTitle,
+                icon: "./icons/time.svg",
+                content: {
+                    type: "iframe",
+                    url: t.signUrl("./views/card_history.html"),
+                    height: 300,
+                }
+            };
+        });
     }
 }, {
     localization: {
