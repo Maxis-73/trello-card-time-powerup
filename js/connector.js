@@ -121,22 +121,18 @@ async function ensureListTracking(t, card) {
 
 window.TrelloPowerUp.initialize({
     "board-buttons": function (t, opts) {
-        return t.localize('board-button-title').then(function (buttonText) {
-            return [
-                {
-                    text: buttonText,
-                    callback: function (t) {
-                        return t.localize('modal-title').then(function (modalTitle) {
-                            return t.modal({
-                                title: modalTitle,
-                                url: "./views/lists_view.html",
-                                height: 500,
-                            });
-                        });
-                    }
+        return [
+            {
+                text: t.localizeKey('board-button-title', 'Time in list'),
+                callback: function (t) {
+                    return t.modal({
+                        title: t.localizeKey('modal-title', 'Board Lists'),
+                        url: "./views/lists_view.html",
+                        height: 500,
+                    });
                 }
-            ];
-        });
+            }
+        ];
     },
 
     "card-badges": function (t, opts) {
@@ -196,11 +192,9 @@ window.TrelloPowerUp.initialize({
                 await ensureListTracking(t, card);
                 const creationDate = utils.getDateFromCardId(card.id);
 
-                // Obtener traducciones
-                const [timeInListTitle, timeOnBoardTitle] = await Promise.all([
-                    t.localize('time-in-list'),
-                    t.localize('time-on-board')
-                ]);
+                // Obtener traducciones (usando localizeKey que es síncrono)
+                const timeInListTitle = t.localizeKey('time-in-list', 'Time in list');
+                const timeOnBoardTitle = t.localizeKey('time-on-board', 'Time on board');
 
                 return [
                     {
@@ -231,17 +225,15 @@ window.TrelloPowerUp.initialize({
             });
     },
     "card-back-section": function (t, opts) {
-        return t.localize('history-title').then(function (historyTitle) {
-            return {
-                title: historyTitle,
-                icon: "./icons/time.svg",
-                content: {
-                    type: "iframe",
-                    url: t.signUrl("./views/card_history.html"),
-                    height: 300,
-                }
-            };
-        });
+        return {
+            title: t.localizeKey('history-title', 'List History'),
+            icon: "./icons/time.svg",
+            content: {
+                type: "iframe",
+                url: t.signUrl("./views/card_history.html"),
+                height: 300,
+            }
+        };
     }
 }, {
     localization: {
