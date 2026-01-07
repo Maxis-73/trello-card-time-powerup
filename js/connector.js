@@ -123,10 +123,10 @@ window.TrelloPowerUp.initialize({
     "board-buttons": function (t, opts) {
         return [
             {
-                text: "Tiempo en lista",
+                text: t.localizeKey("board-button-title"),
                 callback: function (t) {
                     return t.modal({
-                        title: "Listas del Tablero",
+                        title: t.localizeKey("modal-title"),
                         url: "./views/lists_view.html",
                         height: 500,
                     })
@@ -199,7 +199,7 @@ window.TrelloPowerUp.initialize({
                             // Leer siempre la fecha actual del storage
                             const entryDate = await getListEntryDate(t);
                             return {
-                                title: "Tiempo en lista",
+                                title: t.localizeKey("time-in-list"),
                                 text: utils.getRelativeTime(entryDate),
                                 refresh: 60,
                             };
@@ -209,7 +209,7 @@ window.TrelloPowerUp.initialize({
                         // Badge 2: Tiempo total en tablero
                         dynamic: function () {
                             return {
-                                title: "Tiempo en tablero",
+                                title: t.localizeKey("time-on-board"),
                                 text: utils.getRelativeTime(creationDate),
                                 refresh: 60,
                             };
@@ -220,7 +220,7 @@ window.TrelloPowerUp.initialize({
     },
     "card-back-section": function (t, opts) {
         return {
-            title: "Historial de listas",
+            title: t.localizeKey("history-title"),
             icon: "./icons/time.svg",
             content: {
                 type: "iframe",
@@ -228,5 +228,11 @@ window.TrelloPowerUp.initialize({
                 height: 300,
             }
         };
+    }
+}, {
+    localization: {
+        defaultLocale: "en",
+        supportedLocales: ["en", "es"],
+        resources: './strings/{locale}.json'
     }
 })
