@@ -28,6 +28,34 @@ async function getListEntryDate(t) {
 }
 
 /**
+ * Cierra el tracking cuando la tarjeta entra a una lista no trackeada
+ * @param {Object} t - Instancia de Trello Power-Up
+ * @param {Object} card - Objeto de la tarjeta
+ */
+async function closeTrackingIfNeeded(t, card) {
+    const [storedListId, listHistory] = await Promise.all([
+        t.get('card', 'shared', 'currentListId', null),
+        t.get('card', 'shared', 'listHistory', []),
+    ]);
+
+    // Si la tarjeta cambió de lista y hay historial con entrada abierta
+    if (storedListId !== card.idList && listHistory.length > 0) {
+        const lastIdx = listHistory.length - 1;
+        if (listHistory[lastIdx].exitDate === null) {
+            const now = new Date().toISOString();
+            const updatedHistory = [...listHistory];
+            updatedHistory[lastIdx].exitDate = now;
+
+            await Promise.all([
+                t.set('card', 'shared', 'currentListId', card.idList),
+                t.set('card', 'shared', 'listEntryDate', null), // Limpiar fecha de entrada
+                t.set('card', 'shared', 'listHistory', updatedHistory),
+            ]);
+        }
+    }
+}
+
+/**
  * Actualizar el tracking en lista y guardar historial
  * Solo se debe llamar UNA vez cuando se detecta cambio de lista
  * @param {Object} t - Instancia de Trello Power-Up
@@ -112,8 +140,9 @@ window.TrelloPowerUp.initialize({
             .then(async function (card) {
                 const listStates = await t.get('board', 'private', 'listStates', {});
 
-                // Si la lista está desmarcada (false), no mostramos nada
+                // Si la lista está desmarcada (false), cerrar tracking y no mostrar nada
                 if (listStates[card.idList] === false) {
+                    await closeTrackingIfNeeded(t, card);
                     return [];
                 }
 
@@ -153,8 +182,9 @@ window.TrelloPowerUp.initialize({
             .then(async function (card) {
                 const listStates = await t.get('board', 'private', 'listStates', {});
 
-                // Si la lista está desmarcada (false), no mostramos nada
+                // Si la lista está desmarcada (false), cerrar tracking y no mostrar nada
                 if (listStates[card.idList] === false) {
+                    await closeTrackingIfNeeded(t, card);
                     return [];
                 }
 
