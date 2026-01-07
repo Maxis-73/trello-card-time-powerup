@@ -130,5 +130,16 @@ window.TrelloPowerUp.initialize({
                     }
                 ];
             });
+    },
+    "card-back-history": function (t, opts) {
+        return {
+            text: "Historial",
+            icon: "./icons/time.svg",
+            content: {
+                type: "iframe",
+                url: t.signUrl("./views/card_history.html"),
+                height: 300,
+            }
+        }
     }
 })
