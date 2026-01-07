@@ -247,6 +247,6 @@ window.TrelloPowerUp.initialize({
     localization: {
         defaultLocale: "en",
         supportedLocales: ["en", "es"],
-        resources: './strings/{locale}.json'
+        resourceUrl: './strings/{locale}.json'
     }
 })
