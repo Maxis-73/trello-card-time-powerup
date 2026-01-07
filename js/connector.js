@@ -128,7 +128,7 @@ window.TrelloPowerUp.initialize({
                     return t.modal({
                         title: t.localizeKey('modal-title', 'Board Lists'),
                         url: "./views/lists_view.html",
-                        height: 500,
+                        height: 600,
                     });
                 }
             }
