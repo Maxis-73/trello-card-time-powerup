@@ -18,8 +18,18 @@ async function getListName(t, listId) {
 }
 
 /**
+ * Obtiene la fecha de entrada a la lista actual (solo lectura, no modifica nada)
+ * @param {Object} t - Instancia de Trello Power-Up
+ * @returns {Promise<Date>} - Fecha de entrada a la lista
+ */
+async function getListEntryDate(t) {
+    const storedEntryDate = await t.get('card', 'shared', 'listEntryDate', null);
+    return storedEntryDate ? new Date(storedEntryDate) : new Date();
+}
+
+/**
  * Actualizar el tracking en lista y guardar historial
- * Reinicia el contador si la tarjeta cambia de lista
+ * Solo se debe llamar UNA vez cuando se detecta cambio de lista
  * @param {Object} t - Instancia de Trello Power-Up
  * @param {Object} card - Objeto de la tarjeta
  * @returns {Promise<Date>} - Fecha de entrada a la lista
@@ -32,53 +42,53 @@ async function ensureListTracking(t, card) {
         t.get('card', 'shared', 'listHistory', []),
     ]);
 
-    // Si cambió de lista o es la primera vez
-    if (storedListId !== card.idList || !storedEntryDate) {
-        const now = new Date().toISOString();
-        const newListName = await getListName(t, card.idList);
-
-        // Crear copia del historial para modificar
-        const updatedHistory = [...listHistory];
-
-        // Verificar si ya existe una entrada abierta para esta lista (evitar duplicados por race condition)
-        const existingOpenEntry = updatedHistory.find(
-            entry => entry.listId === card.idList && entry.exitDate === null
-        );
-
-        if (existingOpenEntry) {
-            // Ya existe una entrada abierta para esta lista, no duplicar
-            return new Date(existingOpenEntry.entryDate);
-        }
-
-        // Si había una lista anterior, cerrar su entrada en el historial
-        if (storedListId && storedEntryDate && updatedHistory.length > 0) {
-            // Buscar la última entrada sin fecha de salida
-            const lastEntryIndex = updatedHistory.findIndex(
-                entry => entry.listId === storedListId && entry.exitDate === null
-            );
-            if (lastEntryIndex !== -1) {
-                updatedHistory[lastEntryIndex].exitDate = now;
-            }
-        }
-
-        // Agregar nueva entrada al historial
-        updatedHistory.push({
-            listId: card.idList,
-            listName: newListName,
-            entryDate: now,
-            exitDate: null
-        });
-
-        // Guardar todo
-        await Promise.all([
-            t.set('card', 'shared', 'currentListId', card.idList),
-            t.set('card', 'shared', 'listEntryDate', now),
-            t.set('card', 'shared', 'listHistory', updatedHistory),
-        ]);
-
-        return new Date(now);
+    // Si NO cambió de lista y ya tiene fecha, retornar la fecha existente
+    if (storedListId === card.idList && storedEntryDate) {
+        return new Date(storedEntryDate);
     }
-    return new Date(storedEntryDate);
+
+    // Verificar si la última entrada del historial ya es para esta lista y está abierta
+    // Esto evita duplicados por race condition
+    const lastEntry = listHistory.length > 0 ? listHistory[listHistory.length - 1] : null;
+    if (lastEntry && lastEntry.listId === card.idList && lastEntry.exitDate === null) {
+        // Ya existe una entrada abierta para esta lista, actualizar currentListId si es necesario
+        if (storedListId !== card.idList) {
+            await t.set('card', 'shared', 'currentListId', card.idList);
+        }
+        return new Date(lastEntry.entryDate);
+    }
+
+    // Es un cambio de lista real, proceder con la actualización
+    const now = new Date().toISOString();
+    const newListName = await getListName(t, card.idList);
+
+    // Crear copia del historial para modificar
+    const updatedHistory = [...listHistory];
+
+    // Cerrar la última entrada abierta (si existe)
+    if (updatedHistory.length > 0) {
+        const lastIdx = updatedHistory.length - 1;
+        if (updatedHistory[lastIdx].exitDate === null) {
+            updatedHistory[lastIdx].exitDate = now;
+        }
+    }
+
+    // Agregar nueva entrada al historial
+    updatedHistory.push({
+        listId: card.idList,
+        listName: newListName,
+        entryDate: now,
+        exitDate: null
+    });
+
+    // Guardar todo de forma atómica
+    await Promise.all([
+        t.set('card', 'shared', 'currentListId', card.idList),
+        t.set('card', 'shared', 'listEntryDate', now),
+        t.set('card', 'shared', 'listHistory', updatedHistory),
+    ]);
+
+    return new Date(now);
 }
 
 window.TrelloPowerUp.initialize({
@@ -98,30 +108,27 @@ window.TrelloPowerUp.initialize({
     },
 
     "card-badges": function (t, opts) {
-        return Promise.all([
-            t.card("id", "idList"),
-            t.get('board', 'private', 'listStates', {})
-        ])
-            .then(async function (results) {
-                var card = results[0];
-                var listStates = results[1];
+        return t.card("id", "idList")
+            .then(async function (card) {
+                const listStates = await t.get('board', 'private', 'listStates', {});
 
                 // Si la lista está desmarcada (false), no mostramos nada
                 if (listStates[card.idList] === false) {
                     return [];
                 }
 
-                // Asegurar tracking de lista y obtener fecha de entrada
-                const listEntryDate = await ensureListTracking(t, card);
+                // Asegurar tracking de lista (solo escribe si es necesario)
+                await ensureListTracking(t, card);
                 const creationDate = utils.getDateFromCardId(card.id);
 
                 return [
                     {
                         // Badge 1: Tiempo en lista actual
-                        dynamic: function () {
-                            // Usar la fecha ya obtenida, no volver a llamar ensureListTracking
+                        dynamic: async function () {
+                            // Leer siempre la fecha actual del storage
+                            const entryDate = await getListEntryDate(t);
                             return {
-                                text: utils.getRelativeTime(listEntryDate),
+                                text: utils.getRelativeTime(entryDate),
                                 icon: "./icons/time.svg",
                                 refresh: 60,
                             };
@@ -142,31 +149,28 @@ window.TrelloPowerUp.initialize({
     },
 
     "card-detail-badges": function (t, opts) {
-        return Promise.all([
-            t.card("id", "idList"),
-            t.get('board', 'private', 'listStates', {})
-        ])
-            .then(async function (results) {
-                var card = results[0];
-                var listStates = results[1];
+        return t.card("id", "idList")
+            .then(async function (card) {
+                const listStates = await t.get('board', 'private', 'listStates', {});
 
                 // Si la lista está desmarcada (false), no mostramos nada
                 if (listStates[card.idList] === false) {
                     return [];
                 }
 
-                // Asegurar tracking de lista y obtener fecha de entrada
-                const listEntryDate = await ensureListTracking(t, card);
+                // Asegurar tracking de lista (solo escribe si es necesario)
+                await ensureListTracking(t, card);
                 const creationDate = utils.getDateFromCardId(card.id);
 
                 return [
                     {
                         // Badge 1: Tiempo en lista actual
-                        dynamic: function () {
-                            // Usar la fecha ya obtenida, no volver a llamar ensureListTracking
+                        dynamic: async function () {
+                            // Leer siempre la fecha actual del storage
+                            const entryDate = await getListEntryDate(t);
                             return {
                                 title: "Tiempo en lista",
-                                text: utils.getRelativeTime(listEntryDate),
+                                text: utils.getRelativeTime(entryDate),
                                 refresh: 60,
                             };
                         }
