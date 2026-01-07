@@ -2,14 +2,12 @@ var t = window.TrelloPowerUp.iframe();
 
 /**
  * Calcula la duración entre dos fechas
- * @param {string} startDate - Fecha de inicio (ISO string)
- * @param {string} endDate - Fecha de fin (ISO string)
- * @returns {number} - Duración en minutos
+ * @param {Date} startDate - Fecha de inicio
+ * @param {Date} endDate - Fecha de fin
+ * @returns {string} - Duración formateada
  */
-function getDuration(startDate, endDate) {
-    const start = new Date(startDate);
-    const end = endDate ? new Date(endDate) : new Date();
-    const diffInMs = end - start;
+function getDurationBetweenDates(startDate, endDate) {
+    const diffInMs = endDate - startDate;
     const diffInMins = Math.floor(diffInMs / (1000 * 60));
     const diffInHours = Math.floor(diffInMs / (1000 * 60 * 60));
     const diffInDays = Math.floor(diffInMs / (1000 * 60 * 60 * 24));
@@ -52,7 +50,10 @@ function renderHistory(history) {
 
     history.forEach(function (item, index) {
         const isCurrent = item.exitDate === null;
-        const duration = getDuration(item.entryDate, item.exitDate);
+        // Si tiene exitDate, calcular duración entre entry y exit
+        // Si no tiene exitDate (lista actual), calcular desde entry hasta ahora
+        const endDate = item.exitDate ? new Date(item.exitDate) : new Date();
+        const duration = getDurationBetweenDates(new Date(item.entryDate), endDate);
 
         const historyItem = document.createElement('div');
         historyItem.className = 'history-item' + (isCurrent ? ' current' : '');
