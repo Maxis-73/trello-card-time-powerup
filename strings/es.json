@@ -1,7 +1,11 @@
 {
-    "board-button-title": "Tiempo en lista",
-    "modal-title": "Listas disponibles en el tablero",
-    "time-in-list": "Tiempo en lista",
-    "time-on-board": "Tiempo en tablero",
-    "history-title": "Historial de listas"
+    "board-button-title": "Tiempo En Lista",
+    "modal-title": "Listas Disponibles En El Tablero",
+    "time-in-list": "Tiempo En Lista",
+    "time-on-board": "Tiempo En Tablero",
+    "history-title": "Historial De Listas",
+    "loading-history": "Cargando historial...",
+    "lists-title": "Listas Disponibles En El Tablero",
+    "lists-description": "Elige las listas para mostrar los indicadores de tiempo (total del tablero y por tarjeta)",
+    "loading-lists": "Cargando listas..."
 }

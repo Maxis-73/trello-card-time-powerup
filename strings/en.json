@@ -1,7 +1,11 @@
 {
-    "board-button-title": "Time in list",
-    "modal-title": "Lists available on the board",
-    "time-in-list": "Time in list",
-    "time-on-board": "Time on board",
-    "history-title": "List history"
+    "board-button-title": "Time In List",
+    "modal-title": "Lists Available On The Board",
+    "time-in-list": "Time In List",
+    "time-on-board": "Time On Board",
+    "history-title": "List History",
+    "loading-history": "Loading history...",
+    "lists-title": "Board Lists",
+    "lists-description": "Choose the lists to show the time indicators (total of the board and by card)",
+    "loading-lists": "Loading lists..."
 }
