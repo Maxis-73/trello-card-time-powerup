@@ -40,6 +40,16 @@ async function ensureListTracking(t, card) {
         // Crear copia del historial para modificar
         const updatedHistory = [...listHistory];
 
+        // Verificar si ya existe una entrada abierta para esta lista (evitar duplicados por race condition)
+        const existingOpenEntry = updatedHistory.find(
+            entry => entry.listId === card.idList && entry.exitDate === null
+        );
+
+        if (existingOpenEntry) {
+            // Ya existe una entrada abierta para esta lista, no duplicar
+            return new Date(existingOpenEntry.entryDate);
+        }
+
         // Si había una lista anterior, cerrar su entrada en el historial
         if (storedListId && storedEntryDate && updatedHistory.length > 0) {
             // Buscar la última entrada sin fecha de salida
@@ -108,11 +118,10 @@ window.TrelloPowerUp.initialize({
                 return [
                     {
                         // Badge 1: Tiempo en lista actual
-                        dynamic: async function () {
-                            // Re-verificar tracking (puede haber cambiado de lista)
-                            const entryDate = await ensureListTracking(t, card);
+                        dynamic: function () {
+                            // Usar la fecha ya obtenida, no volver a llamar ensureListTracking
                             return {
-                                text: utils.getRelativeTime(entryDate),
+                                text: utils.getRelativeTime(listEntryDate),
                                 icon: "./icons/time.svg",
                                 refresh: 60,
                             };
@@ -153,12 +162,11 @@ window.TrelloPowerUp.initialize({
                 return [
                     {
                         // Badge 1: Tiempo en lista actual
-                        dynamic: async function () {
-                            // Re-verificar tracking (puede haber cambiado de lista)
-                            const entryDate = await ensureListTracking(t, card);
+                        dynamic: function () {
+                            // Usar la fecha ya obtenida, no volver a llamar ensureListTracking
                             return {
                                 title: "Tiempo en lista",
-                                text: utils.getRelativeTime(entryDate),
+                                text: utils.getRelativeTime(listEntryDate),
                                 refresh: 60,
                             };
                         }
