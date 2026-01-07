@@ -1,7 +1,24 @@
 import { utils } from './utils.js';
 
 /**
- * Actualizar el tracking en lista
+ * Obtiene el nombre de una lista por su ID
+ * @param {Object} t - Instancia de Trello Power-Up
+ * @param {string} listId - ID de la lista
+ * @returns {Promise<string>} - Nombre de la lista
+ */
+async function getListName(t, listId) {
+    try {
+        const lists = await t.lists('id', 'name');
+        const list = lists.find(l => l.id === listId);
+        return list ? list.name : 'Lista desconocida';
+    } catch (error) {
+        console.error('Error al obtener nombre de lista:', error);
+        return 'Lista desconocida';
+    }
+}
+
+/**
+ * Actualizar el tracking en lista y guardar historial
  * Reinicia el contador si la tarjeta cambia de lista
  * @param {Object} t - Instancia de Trello Power-Up
  * @param {Object} card - Objeto de la tarjeta
@@ -9,18 +26,46 @@ import { utils } from './utils.js';
  */
 async function ensureListTracking(t, card) {
     // Obtener datos almacenados
-    const [storedListId, storedEntryDate] = await Promise.all([
-        t.get('card', 'private', 'currentListId', null),
-        t.get('card', 'private', 'listEntryDate', null),
+    const [storedListId, storedEntryDate, listHistory] = await Promise.all([
+        t.get('card', 'shared', 'currentListId', null),
+        t.get('card', 'shared', 'listEntryDate', null),
+        t.get('card', 'shared', 'listHistory', []),
     ]);
 
-    // Si cambió de lista o es la primera vez, reiniciar contador
+    // Si cambió de lista o es la primera vez
     if (storedListId !== card.idList || !storedEntryDate) {
         const now = new Date().toISOString();
+        const newListName = await getListName(t, card.idList);
+
+        // Crear copia del historial para modificar
+        const updatedHistory = [...listHistory];
+
+        // Si había una lista anterior, cerrar su entrada en el historial
+        if (storedListId && storedEntryDate && updatedHistory.length > 0) {
+            // Buscar la última entrada sin fecha de salida
+            const lastEntryIndex = updatedHistory.findIndex(
+                entry => entry.listId === storedListId && entry.exitDate === null
+            );
+            if (lastEntryIndex !== -1) {
+                updatedHistory[lastEntryIndex].exitDate = now;
+            }
+        }
+
+        // Agregar nueva entrada al historial
+        updatedHistory.push({
+            listId: card.idList,
+            listName: newListName,
+            entryDate: now,
+            exitDate: null
+        });
+
+        // Guardar todo
         await Promise.all([
-            t.set('card', 'private', 'currentListId', card.idList),
-            t.set('card', 'private', 'listEntryDate', now),
+            t.set('card', 'shared', 'currentListId', card.idList),
+            t.set('card', 'shared', 'listEntryDate', now),
+            t.set('card', 'shared', 'listHistory', updatedHistory),
         ]);
+
         return new Date(now);
     }
     return new Date(storedEntryDate);
@@ -131,15 +176,15 @@ window.TrelloPowerUp.initialize({
                 ];
             });
     },
-    "card-back-history": function (t, opts) {
+    "card-back-section": function (t, opts) {
         return {
-            text: "Historial",
+            title: "Historial de listas",
             icon: "./icons/time.svg",
             content: {
                 type: "iframe",
                 url: t.signUrl("./views/card_history.html"),
                 height: 300,
             }
-        }
+        };
     }
 })

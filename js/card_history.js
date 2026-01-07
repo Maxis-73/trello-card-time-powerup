@@ -61,8 +61,8 @@ function renderHistory(history) {
             <div class="history-icon">${listIcon}</div>
             <div class="history-content">
                 <div>
-                    <span class="history-list-name>${escapeHtml(item.listName)}</span>
-                    ${isCurrent ? '<span class="current-badge>Actual</span>' : ''}
+                    <span class="history-list-name">${escapeHtml(item.listName)}</span>
+                    ${isCurrent ? '<span class="current-badge">Actual</span>' : ''}
                 </div>
                 <span class="history-duration">${duration}</span>
             </div>
@@ -101,8 +101,10 @@ function showError(message) {
 t.get('card', 'shared', 'listHistory', [])
     .then(function (history) {
         renderHistory(history);
+        // Ajustar altura del iframe al contenido
+        t.sizeTo('#history-container').catch(function () { });
     })
     .catch(function (error) {
         console.error('Error al obtener el historial:', error);
         showError('Error al cargar el historial.');
-    })
+    });
