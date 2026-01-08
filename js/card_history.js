@@ -58,16 +58,13 @@ function renderHistory(history) {
         container.innerHTML = `
             <div class="empty-state">
                 <div class="empty-state-icon">📋</div>
-                <div class="empty-state-text">${t.localizeKey('no-history', 'No list history available.')}</div>
+                <div class="empty-state-text">No hay historial de listas disponible.</div>
             </div>
         `;
         return;
     }
 
     container.innerHTML = '';
-
-    // Obtener la traducción para "Actual" una sola vez
-    const currentBadgeText = t.localizeKey('current-badge', 'Current');
 
     history.forEach(function (item, index) {
         const isCurrent = item.exitDate === null;
@@ -84,7 +81,7 @@ function renderHistory(history) {
             <div class="history-content">
                 <div>
                     <span class="history-list-name">${escapeHtml(item.listName)}</span>
-                    ${isCurrent ? `<span class="current-badge">${currentBadgeText}</span>` : ''}
+                    ${isCurrent ? '<span class="current-badge">Actual</span>' : ''}
                 </div>
                 <span class="history-duration">${duration}</span>
             </div>
@@ -129,6 +126,6 @@ t.render(function () {
         })
         .catch(function (error) {
             console.error('Error al obtener el historial:', error);
-            showError(t.localizeKey('error-loading-history', 'Error loading history.'));
+            showError('Error al cargar el historial.');
         });
 });
