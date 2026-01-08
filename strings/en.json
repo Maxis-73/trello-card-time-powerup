@@ -19,5 +19,6 @@
     "time-month": "month",
     "time-months": "months",
     "time-year": "year",
-    "time-years": "years"
+    "time-years": "years",
+    "current-badge": "Current"
 }

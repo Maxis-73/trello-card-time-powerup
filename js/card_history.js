@@ -72,6 +72,9 @@ function renderHistory(history) {
 
     container.innerHTML = '';
 
+    // Obtener la traducción para "Actual/Current" una sola vez
+    const currentBadgeText = t.localizeKey('current-badge', 'Current');
+
     history.forEach(function (item, index) {
         const isCurrent = item.exitDate === null;
         // Si tiene exitDate, calcular duración entre entry y exit
@@ -87,7 +90,7 @@ function renderHistory(history) {
             <div class="history-content">
                 <div>
                     <span class="history-list-name">${escapeHtml(item.listName)}</span>
-                    ${isCurrent ? '<span class="current-badge">Actual</span>' : ''}
+                    ${isCurrent ? `<span class="current-badge">${currentBadgeText}</span>` : ''}
                 </div>
                 <span class="history-duration">${duration}</span>
             </div>

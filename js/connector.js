@@ -123,6 +123,7 @@ window.TrelloPowerUp.initialize({
     "board-buttons": function (t, opts) {
         return [
             {
+                icon: "./icons/list.svg",
                 text: t.localizeKey('board-button-title', 'Time in list'),
                 callback: function (t) {
                     return t.modal({
