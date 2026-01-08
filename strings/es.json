@@ -19,5 +19,8 @@
     "time-month": "mes",
     "time-months": "meses",
     "time-year": "año",
-    "time-years": "años"
+    "time-years": "años",
+    "no-history": "No hay historial de listas disponible.",
+    "current-badge": "Actual",
+    "error-loading-history": "Error al cargar el historial."
 }

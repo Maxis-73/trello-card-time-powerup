@@ -58,13 +58,16 @@ function renderHistory(history) {
         container.innerHTML = `
             <div class="empty-state">
                 <div class="empty-state-icon">📋</div>
-                <div class="empty-state-text">No hay historial de listas disponible.</div>
+                <div class="empty-state-text">${t.localizeKey('no-history', 'No list history available.')}</div>
             </div>
         `;
         return;
     }
 
     container.innerHTML = '';
+
+    // Obtener la traducción para "Actual" una sola vez
+    const currentBadgeText = t.localizeKey('current-badge', 'Current');
 
     history.forEach(function (item, index) {
         const isCurrent = item.exitDate === null;
@@ -81,7 +84,7 @@ function renderHistory(history) {
             <div class="history-content">
                 <div>
                     <span class="history-list-name">${escapeHtml(item.listName)}</span>
-                    ${isCurrent ? '<span class="current-badge">Actual</span>' : ''}
+                    ${isCurrent ? `<span class="current-badge">${currentBadgeText}</span>` : ''}
                 </div>
                 <span class="history-duration">${duration}</span>
             </div>
@@ -116,14 +119,16 @@ function showError(message) {
     `;
 }
 
-// Obtener y renderizar el historial
-t.get('card', 'shared', 'listHistory', [])
-    .then(function (history) {
-        renderHistory(history);
-        // Ajustar altura del iframe al contenido
-        t.sizeTo('#history-container').catch(function () { });
-    })
-    .catch(function (error) {
-        console.error('Error al obtener el historial:', error);
-        showError('Error al cargar el historial.');
-    });
+// Usar t.render() para asegurar que el localizador esté disponible
+t.render(function () {
+    t.get('card', 'shared', 'listHistory', [])
+        .then(function (history) {
+            renderHistory(history);
+            // Ajustar altura del iframe al contenido
+            t.sizeTo('#history-container').catch(function () { });
+        })
+        .catch(function (error) {
+            console.error('Error al obtener el historial:', error);
+            showError(t.localizeKey('error-loading-history', 'Error loading history.'));
+        });
+});

@@ -19,5 +19,8 @@
     "time-month": "month",
     "time-months": "months",
     "time-year": "year",
-    "time-years": "years"
+    "time-years": "years",
+    "no-history": "No list history available.",
+    "current-badge": "Current",
+    "error-loading-history": "Error loading history."
 }
