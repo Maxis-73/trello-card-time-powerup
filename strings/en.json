@@ -20,5 +20,7 @@
     "time-months": "months",
     "time-year": "year",
     "time-years": "years",
-    "current-badge": "Current"
+    "current-badge": "Current",
+    "save-button": "Save",
+    "saved-message": "Settings saved!"
 }

@@ -20,5 +20,7 @@
     "time-months": "meses",
     "time-year": "año",
     "time-years": "años",
-    "current-badge": "Actual"
+    "current-badge": "Actual",
+    "save-button": "Guardar",
+    "saved-message": "¡Configuración guardada!"
 }
