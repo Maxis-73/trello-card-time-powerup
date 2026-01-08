@@ -1,4 +1,10 @@
-var t = window.TrelloPowerUp.iframe();
+var t = window.TrelloPowerUp.iframe({
+    localization: {
+        defaultLocale: "en",
+        supportedLocales: ["en", "es"],
+        resourceUrl: '../strings/{locale}.json'
+    }
+});
 
 /**
  * Calcula la duración entre dos fechas
