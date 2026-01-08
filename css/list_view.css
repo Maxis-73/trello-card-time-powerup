@@ -1,0 +1,61 @@
+body {
+    padding: 10px;
+}
+
+.list-item {
+    padding: 8px;
+    border-bottom: 1px solid #eee;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.list-item:last-child {
+    border-bottom: none;
+}
+
+.list-name {
+    font-weight: bold;
+}
+
+.button-container {
+    margin-top: 20px;
+    text-align: center;
+}
+
+.save-button {
+    background-color: #0079bf;
+    color: white;
+    border: none;
+    padding: 10px 24px;
+    border-radius: 3px;
+    font-size: 14px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: background-color 0.2s;
+}
+
+.save-button:hover {
+    background-color: #026aa7;
+}
+
+.save-button:active {
+    background-color: #055a8c;
+}
+
+.save-button:disabled {
+    background-color: #a5acb0;
+    cursor: not-allowed;
+}
+
+.saved-message {
+    color: #61bd4f;
+    font-size: 14px;
+    margin-top: 10px;
+    opacity: 0;
+    transition: opacity 0.3s;
+}
+
+.saved-message.visible {
+    opacity: 1;
+}
