@@ -6,5 +6,18 @@
     "history-title": "List History",
     "loading-history": "Loading history...",
     "lists-description": "Choose the lists to show the time indicators (total of the board and by card)",
-    "loading-lists": "Loading lists..."
+    "loading-lists": "Loading lists...",
+    "time-now": "now",
+    "time-minute": "minute",
+    "time-minutes": "minutes",
+    "time-hour": "hour",
+    "time-hours": "hours",
+    "time-day": "day",
+    "time-days": "days",
+    "time-week": "week",
+    "time-weeks": "weeks",
+    "time-month": "month",
+    "time-months": "months",
+    "time-year": "year",
+    "time-years": "years"
 }

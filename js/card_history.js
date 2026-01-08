@@ -15,13 +15,31 @@ function getDurationBetweenDates(startDate, endDate) {
     const diffInMonths = Math.floor(diffInDays / 30);
     const diffInYears = Math.floor(diffInDays / 365);
 
-    if (diffInMins < 1) return 'ahora';
-    if (diffInMins < 60) return `${diffInMins} ${diffInMins === 1 ? 'minuto' : 'minutos'}`;
-    if (diffInHours < 24) return `${diffInHours} ${diffInHours === 1 ? 'hora' : 'horas'}`;
-    if (diffInDays < 7) return `${diffInDays} ${diffInDays === 1 ? 'día' : 'días'}`;
-    if (diffInWeeks < 4) return `${diffInWeeks} ${diffInWeeks === 1 ? 'semana' : 'semanas'}`;
-    if (diffInMonths < 12) return `${diffInMonths} ${diffInMonths === 1 ? 'mes' : 'meses'}`;
-    return `${diffInYears} ${diffInYears === 1 ? 'año' : 'años'}`;
+    const localize = (key, fallback) => t.localizeKey(key, fallback);
+
+    if (diffInMins < 1) return localize('time-now', 'now');
+    if (diffInMins < 60) {
+        const unit = diffInMins === 1 ? localize('time-minute', 'minute') : localize('time-minutes', 'minutes');
+        return `${diffInMins} ${unit}`;
+    }
+    if (diffInHours < 24) {
+        const unit = diffInHours === 1 ? localize('time-hour', 'hour') : localize('time-hours', 'hours');
+        return `${diffInHours} ${unit}`;
+    }
+    if (diffInDays < 7) {
+        const unit = diffInDays === 1 ? localize('time-day', 'day') : localize('time-days', 'days');
+        return `${diffInDays} ${unit}`;
+    }
+    if (diffInWeeks < 4) {
+        const unit = diffInWeeks === 1 ? localize('time-week', 'week') : localize('time-weeks', 'weeks');
+        return `${diffInWeeks} ${unit}`;
+    }
+    if (diffInMonths < 12) {
+        const unit = diffInMonths === 1 ? localize('time-month', 'month') : localize('time-months', 'months');
+        return `${diffInMonths} ${unit}`;
+    }
+    const unit = diffInYears === 1 ? localize('time-year', 'year') : localize('time-years', 'years');
+    return `${diffInYears} ${unit}`;
 }
 
 // Icono SVG

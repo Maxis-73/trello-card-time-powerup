@@ -157,7 +157,7 @@ window.TrelloPowerUp.initialize({
                             // Leer siempre la fecha actual del storage
                             const entryDate = await getListEntryDate(t);
                             return {
-                                text: utils.getRelativeTime(entryDate),
+                                text: utils.getRelativeTime(entryDate, t),
                                 icon: "./icons/time.svg",
                                 refresh: 60,
                             };
@@ -167,7 +167,7 @@ window.TrelloPowerUp.initialize({
                         // Badge 2: Tiempo total en tablero
                         dynamic: function () {
                             return {
-                                text: utils.getRelativeTime(creationDate),
+                                text: utils.getRelativeTime(creationDate, t),
                                 icon: "./icons/calendar.svg",
                                 refresh: 60,
                             };
@@ -205,7 +205,7 @@ window.TrelloPowerUp.initialize({
                             const entryDate = await getListEntryDate(t);
                             return {
                                 title: timeInListTitle,
-                                text: utils.getRelativeTime(entryDate),
+                                text: utils.getRelativeTime(entryDate, t),
                                 refresh: 60,
                             };
                         }
@@ -216,7 +216,7 @@ window.TrelloPowerUp.initialize({
                         dynamic: function () {
                             return {
                                 title: timeOnBoardTitle,
-                                text: utils.getRelativeTime(creationDate),
+                                text: utils.getRelativeTime(creationDate, t),
                                 refresh: 60,
                             };
                         }

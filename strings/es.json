@@ -6,5 +6,18 @@
     "history-title": "Historial De Listas",
     "loading-history": "Cargando historial...",
     "lists-description": "Elige las listas para mostrar los indicadores de tiempo (total del tablero y por tarjeta)",
-    "loading-lists": "Cargando listas..."
+    "loading-lists": "Cargando listas...",
+    "time-now": "ahora",
+    "time-minute": "minuto",
+    "time-minutes": "minutos",
+    "time-hour": "hora",
+    "time-hours": "horas",
+    "time-day": "día",
+    "time-days": "días",
+    "time-week": "semana",
+    "time-weeks": "semanas",
+    "time-month": "mes",
+    "time-months": "meses",
+    "time-year": "año",
+    "time-years": "años"
 }
