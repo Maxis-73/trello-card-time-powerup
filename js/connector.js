@@ -226,17 +226,15 @@ window.TrelloPowerUp.initialize({
             });
     },
     "card-back-section": function (t, opts) {
-        return t.card('id').then(function() {
-            return {
-                title: t.localizeKey('history-title', 'List History'),
-                icon: "./icons/time.svg",
-                content: {
-                    type: "iframe",
-                    url: t.signUrl("./views/card_history.html"),
-                    height: 300,
-                }
-            };
-        });
+        return {
+            title: t.localizeKey('history-title', 'List History'),
+            icon: "./icons/time.svg",
+            content: {
+                type: "iframe",
+                url: t.signUrl(window.TrelloPowerUp.util.relativeUrl("./views/card_history.html")),
+                height: 300,
+            }
+        };
     }
 }, {
     localization: {
@@ -244,4 +242,4 @@ window.TrelloPowerUp.initialize({
         supportedLocales: ["en", "es"],
         resourceUrl: './strings/{locale}.json'
     }
-});
+})
