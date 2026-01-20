@@ -231,7 +231,7 @@ window.TrelloPowerUp.initialize({
             icon: "./icons/time.svg",
             content: {
                 type: "iframe",
-                url: t.signUrl("./views/card_history.html"),
+                url: "./views/card_history.html",
                 height: 300,
             }
         };
