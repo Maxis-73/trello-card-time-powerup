@@ -225,9 +225,19 @@ window.TrelloPowerUp.initialize({
                 ];
             });
     },
+    // En js/connector.js
     "card-back-section": function (t, opts) {
-        return t.signUrl("./views/card_history.html")
+        // 1. Primero obtenemos los datos de la tarjeta para poder trackear el movimiento
+        return t.card("id", "idList")
+            .then(async function(card) {
+                // 2. Ejecutamos el tracking solo al abrir la tarjeta (eficiente y permitido)
+                await ensureListTracking(t, card);
+
+                // 3. Ahora generamos la URL firmada para el iframe
+                return t.signUrl("./views/card_history.html");
+            })
             .then(function(signedUrl) {
+                // 4. Retornamos la configuración de la sección
                 return {
                     title: t.localizeKey('history-title', 'List History'),
                     icon: "./icons/time.svg",
@@ -237,6 +247,9 @@ window.TrelloPowerUp.initialize({
                         height: 300,
                     }
                 };
+            })
+            .catch(function(err) {
+                console.error("Error en card-back-section:", err);
             });
     }
 }, {
