@@ -14,7 +14,7 @@ t.render(function () {
     t.localizeNode(document.body);
 
     return Promise.all([
-        t.lists('id', 'name'),
+        t.lists("all"),
         t.get('board', 'private', 'listStates', {})
     ])
         .then(function (results) {
