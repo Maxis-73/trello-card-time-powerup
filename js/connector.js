@@ -226,18 +226,19 @@ window.TrelloPowerUp.initialize({
             });
     },
     "card-back-section": function (t, opts) {
-            return t.card('id').then(function() {
+        return t.signUrl("./views/card_history.html")
+            .then(function(signedUrl) {
                 return {
                     title: t.localizeKey('history-title', 'List History'),
                     icon: "./icons/time.svg",
                     content: {
                         type: "iframe",
-                        url: t.signUrl("./views/card_history.html"),
+                        url: signedUrl,
                         height: 300,
                     }
                 };
             });
-        }
+    }
 }, {
     localization: {
         defaultLocale: "en",
